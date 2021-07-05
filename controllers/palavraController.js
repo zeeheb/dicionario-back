@@ -14,8 +14,10 @@ router.post("/cadastrar", (req, res) => {
     console.log(req.body);
     const palavra = req.body.palavra;
     const regiao = req.body.regiao;
+    const config = req.body.config;
+    const pontoArtic = req.body.pontoArtic;
 
-    db.query('INSERT INTO palavra (nome , regiao) VALUES (?, ?) ', [palavra, regiao], (err, result) => {
+    db.query('INSERT INTO palavra (nome , regiao, config, pontoArtic) VALUES (?, ?, ?, ?) ', [palavra, regiao, config, pontoArtic], (err, result) => {
         if (err) {
             res.send(err)
         } else {
