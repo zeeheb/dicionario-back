@@ -2,6 +2,9 @@ const express = require('express');
 const config = require('../config');
 const router = express.Router();
 const mysql = require('mysql');
+const fs = require('fs');
+const multer = require('multer');
+const multerConfig = require('../config/multer');
 
 const db = mysql.createConnection({
     user: config.user,
@@ -11,7 +14,8 @@ const db = mysql.createConnection({
 })
 
 router.post("/cadastrar", (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
+    // console.log(req.file);
     const palavra = req.body.palavra;
     const regiao = req.body.regiao;
     const config = req.body.config;
@@ -25,5 +29,10 @@ router.post("/cadastrar", (req, res) => {
         }
     });
 });
+
+router.post("/upload",  multer(multerConfig).single('file'), (req, res) => {
+    console.log(req.file);
+    console.log(req.body);
+})
 
 module.exports = router;
