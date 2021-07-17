@@ -24,59 +24,88 @@ router.post("/cadastrar", (req, res) => {
     const pontoArtic = req.body.pontoArtic;
     const caminho = req.body.caminho;
 
-    const idSinal = uuidv4();
-    const idUsuario = uuidv4();
-    const idPalavra = uuidv4();
-    const idConfig = uuidv4();
-    const idRegiao = uuidv4();
-    const idPonto = uuidv4();
+    const idSinal = getRandomInt(10000, 99999);
+    const idUsuario = getRandomInt(10000, 99999);
+    const idPalavra = getRandomInt(10000, 99999);
+    // const idConfig = getRandomInt(10000, 99999);
+    const idRegiao = getRandomInt(10000, 99999);
+    const idPonto = getRandomInt(10000, 99999);
 
     const erros = [];
     const sucessos = [];
 
-    db.query('INSERT INTO sinal (id_sinal , id_usuario, avaliacao, status, caminho) VALUES (?, ?, ?, ?, ?) ', [idSinal, idUsuario, 0, 0, caminho], (err, result) => {
-        if (err) {
-            erros.push(err)
-        } else {
-            sucessos.push(result);
-        }
-    });
+    console.log(palavra, regiao, config, pontoArtic, caminho);
 
     db.query('INSERT INTO palavra (id_palavra , id_usuario_criacao, palavra) ' +
-        'VALUES (?, ?, ?) ', [idPalavra, idUsuario, palavra], (err, result) => {
+        'VALUES (?, ?, ?) ', [idPalavra, 1, palavra], (err, result) => {
         if (err) {
             erros.push(err)
+            console.log("erro palavra", err)
         } else {
             sucessos.push(result);
+            console.log("successo palavra", result)
         }
     });
 
-    db.query('INSERT INTO sinal_config (id_config , id_sinal) ' +
-        'VALUES (?, ?) ', [idConfig, idSinal], (err, result) => {
+
+    db.query('INSERT INTO sinal (id_sinal , id_usuario, id_palavra, avaliacao, status, caminho) VALUES (?, ?, ?, ?, ?, ?) ', [idSinal, 1, idPalavra, 1, 0, caminho ? caminho : ''], (err, result) => {
         if (err) {
             erros.push(err)
+            console.log("erro sinal", err)
         } else {
             sucessos.push(result);
+            console.log("successo sinal", result)
+
         }
     });
 
-    db.query('INSERT INTO sinal_regiao (id_regiao , id_sinal) ' +
-        'VALUES (?, ?) ', [idRegiao, idSinal], (err, result) => {
-        if (err) {
-            erros.push(err)
-        } else {
-            sucessos.push(result);
-        }
-    });
 
-    db.query('INSERT INTO sinal_ponto (id_ponto , id_sinal) ' +
-        'VALUES (?, ?) ', [idPonto, idSinal], (err, result) => {
-        if (err) {
-            erros.push(err)
-        } else {
-            sucessos.push(result);
-        }
-    });
+    const configs = config.split(",")
+    configs.forEach((c) => {
+        db.query('INSERT INTO sinal_config (id_config , id_sinal) ' +
+            'VALUES (?, ?) ', [parseInt(c, 10), idSinal], (err, result) => {
+            if (err) {
+                erros.push(err)
+                console.log("erro sinal config", err)
+
+            } else {
+                sucessos.push(result);
+                console.log("successo sinal config", result)
+            }
+        });
+    })
+
+    const regioes = regiao.split(",")
+    regioes.forEach((r) => {
+        db.query('INSERT INTO sinal_regiao (id_regiao , id_sinal) ' +
+            'VALUES (?, ?) ', [r, idSinal], (err, result) => {
+            if (err) {
+                erros.push(err)
+                console.log("erro sinal regiao", err)
+
+            } else {
+                sucessos.push(result);
+                console.log("successo sinal regiao", result)
+            }
+        });
+    })
+
+
+    const pontos = pontoArtic.split(",")
+    pontos.forEach((p) => {
+        db.query('INSERT INTO sinal_ponto (id_ponto , id_sinal) ' +
+            'VALUES (?, ?) ', [p, idSinal], (err, result) => {
+            if (err) {
+                erros.push(err)
+                console.log("erro sinal ponto", err)
+
+            } else {
+                sucessos.push(result);
+                console.log("successo sinal ponto", result)
+            }
+        });
+    })
+
 
     if (erros.length) {
         res.send(erros);
@@ -92,5 +121,11 @@ router.post("/upload",  multer(multerConfig).single('file'), (req, res) => {
     console.log(req.file);
     console.log(req.body);
 })
+
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min;
+}
 
 module.exports = router;
