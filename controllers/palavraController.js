@@ -113,12 +113,11 @@ router.post("/cadastrar", (req, res) => {
         res.send(sucessos);
     }
 
-    // pensar como fazer a tabela sinal config ponto regiao (adicionare atributo valor pra tabela)
 
 });
 
 router.post("/upload",  multer(multerConfig).single('file'), (req, res) => {
-    console.log(req.file);
+    console.log(req.file, " asaasdasdsadasdadsa");
     console.log(req.body);
 })
 
