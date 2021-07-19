@@ -15,6 +15,29 @@ const db = mysql.createConnection({
     database: config.database
 })
 
+router.post("/avaliar", (req, res) => {
+    const avaliacao = req.body.avaliacao;
+    const sinal = req.body.sinal;
+
+    if (avaliacao && sinal) {
+        db.query('UPDATE sinal ' +
+            'set avaliacao = avaliacao + ?, ' +
+            'qt_avaliacao = qt_avaliacao + 1, ' +
+            'media_avaliacao = avaliacao/qt_avaliacao ' +
+            'where id_sinal = ?', [avaliacao, sinal], (err, result) => {
+            if (err) {
+                res.send(err)
+                console.log("Erro avaliacao", err);
+            } else {
+                res.send(result);
+                console.log("Sucesso avaliacao! ");
+            }
+        });
+    }
+
+    console.log(avaliacao, sinal);
+})
+
 router.post("/cadastrar", (req, res) => {
     // console.log(req.body);
     // console.log(req.file);
