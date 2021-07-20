@@ -31,7 +31,8 @@ router.get("/palavra/:nome", (req, res) => {
         " and sc.id_config = c.id_config" +
         " and sp.id_sinal = s.id_sinal" +
         " and sp.id_ponto = pnt.id_ponto_artic" +
-        " and p.palavra = ?", nome, (err, result) => {
+        " and p.palavra = ? " +
+        " order by id_sinal ", nome, (err, result) => {
         if (err) {
             res.send(err);
         } else {

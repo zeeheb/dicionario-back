@@ -18,21 +18,34 @@ const db = mysql.createConnection({
 router.post("/avaliar", (req, res) => {
     const avaliacao = req.body.avaliacao;
     const sinal = req.body.sinal;
+    // receber id do usuario
 
     if (avaliacao && sinal) {
-        db.query('UPDATE sinal ' +
-            'set avaliacao = avaliacao + ?, ' +
-            'qt_avaliacao = qt_avaliacao + 1, ' +
-            'media_avaliacao = avaliacao/qt_avaliacao ' +
-            'where id_sinal = ?', [avaliacao, sinal], (err, result) => {
+        db.query('insert into avalia_sinal (id_usuario, id_sinal, nota) ' +
+            'values (?, ?, ?)', [1, sinal, avaliacao], (err,result) => {
             if (err) {
-                res.send(err)
-                console.log("Erro avaliacao", err);
+                res.send(err);
+                console.log("erro avalia sinal");
             } else {
-                res.send(result);
-                console.log("Sucesso avaliacao! ");
+                db.query('UPDATE sinal ' +
+                    'set avaliacao = avaliacao + ?, ' +
+                    'qt_avaliacao = qt_avaliacao + 1, ' +
+                    'media_avaliacao = avaliacao/qt_avaliacao ' +
+                    'where id_sinal = ?', [avaliacao, sinal], (err, result) => {
+                    if (err) {
+                        res.send(err)
+                        console.log("Erro avaliacao", err);
+                    } else {
+                        res.send(result);
+                        console.log("Sucesso avaliacao! ");
+                    }
+                });
             }
         });
+    } else {
+        res.send({
+            code: 'Null'
+            })
     }
 
     console.log(avaliacao, sinal);
@@ -71,7 +84,8 @@ router.post("/cadastrar", (req, res) => {
     });
 
 
-    db.query('INSERT INTO sinal (id_sinal , id_usuario, id_palavra, avaliacao, status, caminho) VALUES (?, ?, ?, ?, ?, ?) ', [idSinal, 1, idPalavra, 1, 0, caminho ? caminho : ''], (err, result) => {
+    db.query('INSERT INTO sinal (id_sinal , id_usuario, id_palavra, avaliacao, status, caminho, qt_avaliacao, media_avaliacao) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ',
+        [idSinal, 1, idPalavra, 0, 0, caminho ? caminho : '', 0, 0], (err, result) => {
         if (err) {
             erros.push(err)
             console.log("erro sinal", err)
